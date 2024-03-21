@@ -19,4 +19,4 @@ npm start
 ```
 
 ## Info
-This project is buildin yet.
+This project
