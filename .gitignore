@@ -1,0 +1,9 @@
+# folders
+node_modules/
+New folder/
+
+# security
+.env
+
+# files
+step.txt
