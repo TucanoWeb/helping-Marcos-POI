@@ -6,42 +6,62 @@ const collPoint = collection("points")
 class AnalyticsData {
 
 
-    async findAllCat(){
+    async findAllCat() {
         const res = await collCategory.find({}).toArray()
-        if(res) return res.result.categories
+        let data = []
+
+        res.map(element => data.push({
+            id: element._id.toString(),
+            name: element.name
+        }))
+
+        if (res) return data
         return false
     }
 
-    async findAllPoints(){
+    async findAllPoints() {
         const res = await collPoint.find({}).toArray()
-        if(res) return res.result.points
+        let data = []
+
+        res.map(element => data.push({
+            id: element._id.toString(),
+            name: element.name,
+            category_id: element.category_id,
+            description: element.description
+        }))
+
+        if (res) return data
         return false
     }
 
-    async qtyByCategory(){
+    async qtyByCategory() {
 
-        const analytics = {}
-        
         const categories = await this.findAllCat()
         const points = await this.findAllPoints()
-
-        points.forEach((element, key) => {
-
-            if(key > categories.length){
-                key = categories.length
-            }
-
-            if(element.category_id === categories[key -1]["_id"]){
-                
-                let qnty = 0
-
-                analytics = {
-                    ...analytics,
-                    [categories[key]["name"]]: qnty++
-                }
-            }
-        })
         
+        let analytics = {
+            total: points.length
+        }
+
+        
+        categories.forEach((category) => {
+            
+            let qnty = 0
+            
+            points.forEach((point) => {
+
+                if (category.id === point.category_id) {
+
+                    qnty++
+
+                    analytics = {
+                        ...analytics,
+                        [category.name]: qnty
+                    }
+                }
+            })
+        })
+
         return analytics
     }
 

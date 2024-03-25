@@ -2,34 +2,46 @@ const collection = require("../../models/collection")
 
 const collectionClient = collection("users")
 
+// implement bycript
+const bcrypt = require('bcrypt');
+
 class UserMongo {
 
-    auth(response, email, password){
-        if(response.email === email && response.password === password) return true
+    async findAll() {
+        const res = await collectionClient.find({}).toArray()
+        if (res) return res
         return false
     }
 
-    async createOne(data){
-        try{
+    auth(response, password) {
+        // in the login, already verify if user with the respective email exists. So we'll verify now just password
+        // return bcrypt.compareSync(password, response.password)
+
+        if (response.password === password) return true
+        return false
+
+    }
+
+    async createOne(data) {
+        try {
             await collectionClient.insertOne(data)
             return true
-        } catch(e){
+        } catch (e) {
             console.log(e)
             return e
         }
     }
-    
-    
-    async login(request){
-        
+
+    async login(request) {
+
         const email = request.email
         const password = request.password
 
-        const response = await collectionClient.findOne({email: email})
+        const response = await collectionClient.findOne({ email: email })
 
-        const user = this.auth(response, email, password)
+        const user = this.auth(response, password)
 
-        if(user) return {
+        if (user) return {
             id: response._id,
             name: response.name,
             email: response.email
@@ -37,21 +49,21 @@ class UserMongo {
         return false
     }
 
-    async update(email, data){
+    async update(email, data) {
         try {
-            await collectionClient.updateOne({email: email}, {$set: data})
+            await collectionClient.updateOne({ email: email }, { $set: data })
             return true
-        } catch (e){
+        } catch (e) {
             console.log(e)
             return false
         }
     }
 
-    async delete(email){
-        try{
-            await collectionClient.deleteOne({email: email})
+    async delete(email) {
+        try {
+            await collectionClient.deleteOne({ email: email })
             return true
-        } catch(e){
+        } catch (e) {
             console.log(e)
             return false
         }
